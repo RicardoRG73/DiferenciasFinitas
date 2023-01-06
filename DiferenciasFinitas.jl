@@ -51,6 +51,9 @@ md"""
 ### 1D
 """
 
+# ╔═╡ 408bc361-57b9-40a0-a9b6-3bc70e484072
+md"""#### Primer orden"""
+
 # ╔═╡ 5338756c-1cea-4d78-ad6f-9327943fbb5b
 md"""
 Si discretizamos el dominio de tal manera que tengamos $n$ nodos ($n-1$ intervalos de tamaño $h$, donde $h=\frac{b-a}{n-1}$), entonces tendremos la gráfica de de la izquierda. Al aproximar alguna función utulizando solo esto nodos entonces tendremos algo parecido a la gráfica de la derecha, donde se está calculando la función $u(x) = \sin(2\pi x)$. Al ir aumentando el número de nodos $n$ podemos ver como nuestra aproximación a la función cada vez es mejor.
@@ -58,7 +61,7 @@ Si discretizamos el dominio de tal manera que tengamos $n$ nodos ($n-1$ interval
 
 # ╔═╡ 354d7f42-26d5-4d4f-91e2-926208b26c53
 md"""
-Número de puntos $n =$ $(@bind n Slider(4:31, default=9, show_value=true))
+Número de puntos $n =$ $(@bind n Slider(5:31, default=9, show_value=true))
 """
 
 # ╔═╡ 13d82f8d-c581-4cf0-b197-f80a66793b94
@@ -75,7 +78,34 @@ begin
 	scatter!(x, y₂, color=:1)
 	title!(L"u(x) = \sin(2\pi x)")
 	plot(linea_hor, gr_sin)
-	ylims!((-1.2,1.2), size=(600,300))
+	ylims!((-1.2,1.2), size=(700,300))
+end
+
+# ╔═╡ 9a692171-eb79-4489-9b30-4fff1e9b3b98
+begin
+	# Linea de nodos
+	linea_hor_texto = plot(x,y, legend=false, background=:black, size=(700, 200))
+	scatter!(x,y, color=:1)
+    title!("Nodos")
+	ylims!((-0.5,0.5))
+
+	# longitud h del intervalo
+	altura_anotacion = -0.2
+	point1 = floor(Int,n/2)+1
+	point2 = point1+1
+	points = [x[point1] altura_anotacion; x[point2] altura_anotacion]
+	plot!(points[:,1], points[:,2], color=:white)
+	scatter!(points[:,1], points[:,2], color=:white, markersize=2)
+	annotate!(Statistics.mean(points[:,1]),altura_anotacion-0.05,text(L"h", 10, :white))
+
+	# identificación de los nodos i-1, i, i+1
+	point0 = point1-1
+	points_color = "yellow"
+	annotate!(x[point1],-1altura_anotacion+0.05,text(L"x_i", 13, points_color, :center))
+	annotate!(x[point0],-1altura_anotacion-0.05,text(L"x_{i-1}", 13, points_color, :right))
+	annotate!(x[point2],-1altura_anotacion-0.05,text(L"x_{i+1}", 13, points_color, :left))
+	points = [[x[point0] altura_anotacion]; points]
+	scatter!(points[:,1], 0*points[:,1], color=points_color)
 end
 
 # ╔═╡ 4654ca38-b6c0-4aaa-b906-9d02ab17737f
@@ -106,34 +136,24 @@ $u(x_{i-1})=u_{i-1}$
 
 entonces podemos escribir
 
-$u'_i \approx \frac{u_{i+1}-u_{i}}{h}$
+> $u'_i \approx \frac{u_{i+1}-u_{i}}{h} = \frac{\Delta_+ u}{\Delta x}$
+
+donde $\Delta_+ u = u_{i+1}-u_{i}$ se le conoce como **diferencia hacia adelante**.
+
+De forma análoga podemos obtener la **diferencia hacia atrás**:
+
+> $u'_i \approx \frac{u_{i}-u_{i-1}}{h} = \frac{\Delta_- u}{\Delta x}$
 """
 
-# ╔═╡ 9a692171-eb79-4489-9b30-4fff1e9b3b98
-begin
-	# Linea de nodos
-	linea_hor_texto = plot(x,y, legend=false, background=:black, size=(700, 200))
-	scatter!(x,y, color=:1)
-    title!("Nodos")
-	ylims!((-0.5,0.5))
+# ╔═╡ 4bc9c5a9-09f6-4a22-b34b-cb26de452746
+md"""
+Otra forma de obtener las diferencias es utilizando la serie de Taylor:
 
-	# longitud h del intervalo
-	altura_anotacion = -0.2
-	point1 = Int32(round(n/2))
-	point2 = point1+1
-	points = [x[point1] altura_anotacion; x[point2] altura_anotacion]
-	plot!(points[:,1], points[:,2], color=:white)
-	scatter!(points[:,1], points[:,2], color=:white, markersize=2)
-	annotate!(Statistics.mean(points[:,1]),altura_anotacion-0.05,text(L"h", 10, :white))
+$u(x) = \sum_1^\infty$
+"""
 
-	# identificación de los nodos i-1, i, i+1
-	point0 = point1-1
-	annotate!(x[point1],-1altura_anotacion+0.05,text(L"x_i", 13, :green, :center))
-	annotate!(x[point0],-1altura_anotacion-0.05,text(L"x_{i-1}", 13, :green, :right))
-	annotate!(x[point2],-1altura_anotacion-0.05,text(L"x_{i+1}", 13, :green, :left))
-	points = [[x[point0] altura_anotacion]; points]
-	scatter!(points[:,1], 0*points[:,1], color=:green)
-end
+# ╔═╡ a339ba91-4a29-4498-bcfa-c155ae2e7867
+md"""#### Orden superior"""
 
 # ╔═╡ ecf4abcd-2012-4645-8f13-5899afcd5160
 md"""
@@ -165,7 +185,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.8.2"
 manifest_format = "2.0"
-project_hash = "8ce63f1e9b8fa764af0632e8aa552790c61eb893"
+project_hash = "1d3d255e2876517b6a531e86d6c37750d90df824"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
@@ -1133,11 +1153,14 @@ version = "1.4.1+0"
 # ╟─255cc6d7-9912-446d-8692-a8ed8a1f2719
 # ╟─b4902b16-e90f-4b66-b24e-3092e2dc5c19
 # ╟─2662adeb-ca8d-4cae-a0aa-152846bf37bc
+# ╟─408bc361-57b9-40a0-a9b6-3bc70e484072
 # ╟─5338756c-1cea-4d78-ad6f-9327943fbb5b
 # ╟─354d7f42-26d5-4d4f-91e2-926208b26c53
 # ╟─13d82f8d-c581-4cf0-b197-f80a66793b94
-# ╠═4654ca38-b6c0-4aaa-b906-9d02ab17737f
-# ╠═9a692171-eb79-4489-9b30-4fff1e9b3b98
+# ╟─9a692171-eb79-4489-9b30-4fff1e9b3b98
+# ╟─4654ca38-b6c0-4aaa-b906-9d02ab17737f
+# ╠═4bc9c5a9-09f6-4a22-b34b-cb26de452746
+# ╟─a339ba91-4a29-4498-bcfa-c155ae2e7867
 # ╟─ecf4abcd-2012-4645-8f13-5899afcd5160
 # ╟─929fe9d1-9639-413a-bede-2f7e9487153e
 # ╟─00000000-0000-0000-0000-000000000001
