@@ -87,14 +87,37 @@ $u'(x) = \lim_{h \rightarrow 0} \frac{u(x+h)-u(x)}{h}$
 Si en lugar de calcular el límite cuando $h \rightarrow 0$ dejamos que $h$ tenga un tamaño finito, entonces tenemos:
 
 $u'(x) \approx \frac{u(x+h)-u(x)}{h}$
+
+Abora nos centramos solamente en el nodo i-ésimo con posición en $x_i$, el cual tiene dos nodos vecinos, su vecino de la izquierda tiene posición $x_{i-1} = x-h$ mientras que el vecino de la derecha tiene posición $x_{i+1}=x+h$.
+
+De esta manera obtenemos que
+
+$u'(x_i) \approx \frac{u(x_{i+1})-u(x_{i})}{h}$
+
+Si escribimos de manera compacta:
+
+$u'(x_i) = u'_i$
+
+$u(x_{i+1})=u_{i+1}$
+
+$u(x_i)=u_i$
+
+$u(x_{i-1})=u_{i-1}$
+
+entonces podemos escribir
+
+$u'_i \approx \frac{u_{i+1}-u_{i}}{h}$
 """
 
 # ╔═╡ 9a692171-eb79-4489-9b30-4fff1e9b3b98
 begin
+	# Linea de nodos
 	linea_hor_texto = plot(x,y, legend=false, background=:black, size=(700, 200))
 	scatter!(x,y, color=:1)
     title!("Nodos")
 	ylims!((-0.5,0.5))
+
+	# longitud h del intervalo
 	altura_anotacion = -0.2
 	point1 = Int32(round(n/2))
 	point2 = point1+1
@@ -102,7 +125,14 @@ begin
 	plot!(points[:,1], points[:,2], color=:white)
 	scatter!(points[:,1], points[:,2], color=:white, markersize=2)
 	annotate!(Statistics.mean(points[:,1]),altura_anotacion-0.05,text(L"h", 10, :white))
-	
+
+	# identificación de los nodos i-1, i, i+1
+	point0 = point1-1
+	annotate!(x[point1],-1altura_anotacion+0.05,text(L"x_i", 13, :green, :center))
+	annotate!(x[point0],-1altura_anotacion-0.05,text(L"x_{i-1}", 13, :green, :right))
+	annotate!(x[point2],-1altura_anotacion-0.05,text(L"x_{i+1}", 13, :green, :left))
+	points = [[x[point0] altura_anotacion]; points]
+	scatter!(points[:,1], 0*points[:,1], color=:green)
 end
 
 # ╔═╡ ecf4abcd-2012-4645-8f13-5899afcd5160
@@ -1105,8 +1135,8 @@ version = "1.4.1+0"
 # ╟─2662adeb-ca8d-4cae-a0aa-152846bf37bc
 # ╟─5338756c-1cea-4d78-ad6f-9327943fbb5b
 # ╟─354d7f42-26d5-4d4f-91e2-926208b26c53
-# ╠═13d82f8d-c581-4cf0-b197-f80a66793b94
-# ╟─4654ca38-b6c0-4aaa-b906-9d02ab17737f
+# ╟─13d82f8d-c581-4cf0-b197-f80a66793b94
+# ╠═4654ca38-b6c0-4aaa-b906-9d02ab17737f
 # ╠═9a692171-eb79-4489-9b30-4fff1e9b3b98
 # ╟─ecf4abcd-2012-4645-8f13-5899afcd5160
 # ╟─929fe9d1-9639-413a-bede-2f7e9487153e
