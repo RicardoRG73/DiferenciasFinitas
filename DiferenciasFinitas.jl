@@ -147,13 +147,108 @@ De forma análoga podemos obtener la **diferencia hacia atrás**:
 
 # ╔═╡ 4bc9c5a9-09f6-4a22-b34b-cb26de452746
 md"""
-Otra forma de obtener las diferencias es utilizando la serie de Taylor:
+Otra forma de obtener las diferencias es utilizando la serie de Taylor de la función $u$.
 
-$u(x) = \sum_1^\infty$
+$u(\alpha) = u(\alpha) + \frac{u'(\alpha)}{1!}(x-\alpha) + \frac{u''(\alpha)}{2!}(x-\alpha)^2 + \frac{u'''(\alpha)}{3!}(x-\alpha)^3 + \cdots + \frac{u^{(n)}(\alpha)}{n!}(x-\alpha)^n + \cdots$
+"""
+
+# ╔═╡ 1ed3cc3d-c30e-4fd6-b9d2-48b5c9c3c92f
+md"""
+En forma compacta se puede escribir como
+
+$u(\alpha) = \sum_{n=1}^\infty \frac{u^{(n)}(\alpha)}{n!}(x-\alpha)^n$
+"""
+
+# ╔═╡ 63867307-4db9-42d1-9977-623521235806
+md"""
+Considerando solamente la expanción hasta primer orden, y centrando en $x_{i+1}$ tenemos:
+
+$u(x_{i+1}) = u(x_i) + hu'(x_i) + O(h^2)$
+
+donde $O(h^2)$ es la notación "BigO" que indica el orden del error.
+
+Despejando entonces obtenemos:
+
+$\frac{u(x_{i+1}) - u(x_i)}{h} = u'(x_i) + O(h)$
+
+Entonces la aproximación a la derivada es
+
+> $u'_i \approx \frac{u_{i+1} - u_i}{h} = \frac{\Delta_+ u}{\Delta x}$
+
+y el error de truncamiento $\tau$ es de orden $h$.
+"""
+
+# ╔═╡ ce3942ee-18de-41fb-a9da-435567a487ec
+md"""
+Si ahora centramos la expansión en $x_{i-1}$ tenemos:
+
+$u(x_{i-1}) = u(x_i) - hu'(x_i) + O(h^2)$
+
+Despejando
+
+$\frac{u(x_i) - u(x_{i-1})}{h} = u'(x_i) + O(h)$
+
+Entonces la aproximación a la derivada es
+
+> $u'_i \approx \frac{u_i - u_{i-1}}{h} = \frac{\Delta_- u}{\Delta x}$
+
+y el error de truncamiento $\tau$ también es de orden $h$.
+"""
+
+# ╔═╡ c93e881d-af20-4377-a9d2-4711b57d8bf1
+md"""
+Si consideramos las expansiones, tanto centrada en $x_{i+1}$ como en $x_{i-1}$, hasta segundo orden entonces tenemos:
+
+$u(x_{i+1}) = u(x_i) + hu'(x_i) + \frac{h^2}{2}u''(x_i) + O(h^3)$
+
+$u(x_{i-1}) = u(x_i) - hu'(x_i) + \frac{h^2}{2}u''(x_i) - O(h^3)$
+
+Restando las expresiones anteriores tenemos
+
+$u(x_{i+1}) - u(x_{i-1}) = 2hu'(x_i) + O(h^3)$
+
+Despejando
+
+$\frac{u(x_{i+1}) - u(x_{i-1})}{2h} = u'(x_i) + O(h^2)$
+
+Entonces la aproximación a la derivada es
+
+> $u'_i \approx \frac{u_{i+1} - u_{i-1}}{2h} = \frac{\Delta_\circ u}{2\Delta x}$
+
+donde $\Delta_\circ u = u_{i+1} - u_{i-1}$ es la **diferencia centrada**, y el error de truncamiento de esta aproximación es de orden $h^2$
+"""
+
+# ╔═╡ c4bea5fe-e139-4fba-b74c-c4ef8f2237d0
+md"""##### Resumen
+En resumen para aproximar la primera derivada tenemos las ecuaciones:
+- Diferencia hacia adelante
+
+> $u'_i \approx \frac{u_{i+1} - u_i}{h} = \frac{\Delta_+ u}{\Delta x}$
+
+- Diferencia hacia atrás
+
+> $u'_i \approx \frac{u_i - u_{i-1}}{h} = \frac{\Delta_- u}{\Delta x}$
+
+- Diferencia Centrada
+
+> $u'_i \approx \frac{u_{i+1} - u_{i-1}}{2h} = \frac{\Delta_\circ u}{2\Delta x}$
 """
 
 # ╔═╡ a339ba91-4a29-4498-bcfa-c155ae2e7867
 md"""#### Orden superior"""
+
+# ╔═╡ 40dab807-b8f9-4d02-abb6-755de810e903
+md"""
+Tomemos ahora las expansiones en serie de Taylor en $x_{i+1}$ y en $x_{i-1}$
+
+$u(x_{i+1}) = u(x_i) + hu'(x_i) + \frac{h^2}{2}u''(x_i) + O(h^3)$
+
+$u(x_{i-1}) = u(x_i) - hu'(x_i) + \frac{h^2}{2}u''(x_i) - O(h^3)$
+
+ahora en lugar de restar, vamos a sumar las dos expresiones, entonces obtenemos
+
+$u(x_{i+1}) + u(x_{i-1}) = 2u(x_i)$
+"""
 
 # ╔═╡ ecf4abcd-2012-4645-8f13-5899afcd5160
 md"""
@@ -1159,8 +1254,14 @@ version = "1.4.1+0"
 # ╟─13d82f8d-c581-4cf0-b197-f80a66793b94
 # ╟─9a692171-eb79-4489-9b30-4fff1e9b3b98
 # ╟─4654ca38-b6c0-4aaa-b906-9d02ab17737f
-# ╠═4bc9c5a9-09f6-4a22-b34b-cb26de452746
+# ╟─4bc9c5a9-09f6-4a22-b34b-cb26de452746
+# ╟─1ed3cc3d-c30e-4fd6-b9d2-48b5c9c3c92f
+# ╟─63867307-4db9-42d1-9977-623521235806
+# ╟─ce3942ee-18de-41fb-a9da-435567a487ec
+# ╟─c93e881d-af20-4377-a9d2-4711b57d8bf1
+# ╟─c4bea5fe-e139-4fba-b74c-c4ef8f2237d0
 # ╟─a339ba91-4a29-4498-bcfa-c155ae2e7867
+# ╠═40dab807-b8f9-4d02-abb6-755de810e903
 # ╟─ecf4abcd-2012-4645-8f13-5899afcd5160
 # ╟─929fe9d1-9639-413a-bede-2f7e9487153e
 # ╟─00000000-0000-0000-0000-000000000001
