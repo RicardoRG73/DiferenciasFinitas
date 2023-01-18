@@ -70,7 +70,7 @@ begin
 	y = 0 .* x
 	linea_hor = plot(x,y, legend=false, background=:black)
 	scatter!(x,y, color=:1)
-    title!("Nodos")
+	title!("Nodos")
 	ylims!((-0.5,0.5))
 
 	y₂ = sin.(2*pi*x)
@@ -86,7 +86,7 @@ begin
 	# Linea de nodos
 	linea_hor_texto = plot(x,y, legend=false, background=:black, size=(700, 200))
 	scatter!(x,y, color=:1)
-    title!("Nodos")
+	title!("Nodos")
 	ylims!((-0.5,0.5))
 
 	# longitud h del intervalo
@@ -149,14 +149,14 @@ De forma análoga podemos obtener la **diferencia hacia atrás**:
 md"""
 Otra forma de obtener las diferencias es utilizando la serie de Taylor de la función $u$.
 
-$u(\alpha) = u(\alpha) + \frac{u'(\alpha)}{1!}(x-\alpha) + \frac{u''(\alpha)}{2!}(x-\alpha)^2 + \frac{u'''(\alpha)}{3!}(x-\alpha)^3 + \cdots + \frac{u^{(n)}(\alpha)}{n!}(x-\alpha)^n + \cdots$
+$u(x)|_\alpha = u(\alpha) + \frac{u'(\alpha)}{1!}(x-\alpha) + \frac{u''(\alpha)}{2!}(x-\alpha)^2 + \frac{u'''(\alpha)}{3!}(x-\alpha)^3 + \cdots + \frac{u^{(n)}(\alpha)}{n!}(x-\alpha)^n + \cdots$
 """
 
 # ╔═╡ 1ed3cc3d-c30e-4fd6-b9d2-48b5c9c3c92f
 md"""
 En forma compacta se puede escribir como
 
-$u(\alpha) = \sum_{n=1}^\infty \frac{u^{(n)}(\alpha)}{n!}(x-\alpha)^n$
+$u(x)|_\alpha = \sum_{n=1}^\infty \frac{u^{(n)}(\alpha)}{n!}(x-\alpha)^n$
 """
 
 # ╔═╡ 63867307-4db9-42d1-9977-623521235806
@@ -1263,10 +1263,10 @@ version = "1.4.1+0"
 # ╟─408bc361-57b9-40a0-a9b6-3bc70e484072
 # ╟─5338756c-1cea-4d78-ad6f-9327943fbb5b
 # ╠═354d7f42-26d5-4d4f-91e2-926208b26c53
-# ╠═13d82f8d-c581-4cf0-b197-f80a66793b94
+# ╟─13d82f8d-c581-4cf0-b197-f80a66793b94
 # ╟─9a692171-eb79-4489-9b30-4fff1e9b3b98
 # ╟─4654ca38-b6c0-4aaa-b906-9d02ab17737f
-# ╠═4bc9c5a9-09f6-4a22-b34b-cb26de452746
+# ╟─4bc9c5a9-09f6-4a22-b34b-cb26de452746
 # ╟─1ed3cc3d-c30e-4fd6-b9d2-48b5c9c3c92f
 # ╟─63867307-4db9-42d1-9977-623521235806
 # ╟─ce3942ee-18de-41fb-a9da-435567a487ec
