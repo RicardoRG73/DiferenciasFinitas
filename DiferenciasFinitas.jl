@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.9
+# v0.19.19
 
 using Markdown
 using InteractiveUtils
@@ -241,13 +241,22 @@ md"""#### Orden superior"""
 md"""
 Tomemos ahora las expansiones en serie de Taylor en $x_{i+1}$ y en $x_{i-1}$
 
-$u(x_{i+1}) = u(x_i) + hu'(x_i) + \frac{h^2}{2}u''(x_i) + O(h^3)$
+$u(x_{i+1}) = u(x_i) + hu'(x_i) + \frac{h^2}{2}u''(x_i) + \frac{h^3}{6}u'''(x_i) + O(h^4)$
 
-$u(x_{i-1}) = u(x_i) - hu'(x_i) + \frac{h^2}{2}u''(x_i) - O(h^3)$
+$u(x_{i-1}) = u(x_i) - hu'(x_i) + \frac{h^2}{2}u''(x_i) - \frac{h^3}{6}u'''(x_i) + O(h^4)$
 
 ahora en lugar de restar, vamos a sumar las dos expresiones, entonces obtenemos
 
-$u(x_{i+1}) + u(x_{i-1}) = 2u(x_i)$
+$u(x_{i+1}) + u(x_{i-1}) = 2u(x_i) + h^2u''(x_i) + O(h^4)$
+"""
+
+# ╔═╡ 15287f58-1bb4-4f0e-a645-fef597b9ffdf
+md"""
+Despejando $u''(x_i)$
+
+$\frac{u(x_{i+1}) - 2u(x_i) + u(x_{i-1})}{h^2} = u''(x_i) + O(h^4)$
+
+> $u''_i \approx \frac{u_{i+1} - 2u_i + u_{i-1}}{h^2} = \frac{\Delta^2 u}{\Delta x^2}$
 """
 
 # ╔═╡ ecf4abcd-2012-4645-8f13-5899afcd5160
@@ -259,6 +268,9 @@ md"""
 md"""
 ## Diferencias Fintas Generalizadas
 """
+
+# ╔═╡ 7ba08828-6a61-456e-b6d8-9738e31f1995
+
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -278,7 +290,7 @@ PlutoUI = "~0.7.49"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.8.2"
+julia_version = "1.8.5"
 manifest_format = "2.0"
 project_hash = "1d3d255e2876517b6a531e86d6c37750d90df824"
 
@@ -366,7 +378,7 @@ version = "4.5.0"
 [[deps.CompilerSupportLibraries_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "e66e0078-7015-5450-92f7-15fbd957f2ae"
-version = "0.5.2+0"
+version = "1.0.1+0"
 
 [[deps.Contour]]
 git-tree-sha1 = "d05d9e7b7aedff4e5b51a029dced05cfb6125781"
@@ -1250,19 +1262,21 @@ version = "1.4.1+0"
 # ╟─2662adeb-ca8d-4cae-a0aa-152846bf37bc
 # ╟─408bc361-57b9-40a0-a9b6-3bc70e484072
 # ╟─5338756c-1cea-4d78-ad6f-9327943fbb5b
-# ╟─354d7f42-26d5-4d4f-91e2-926208b26c53
-# ╟─13d82f8d-c581-4cf0-b197-f80a66793b94
+# ╠═354d7f42-26d5-4d4f-91e2-926208b26c53
+# ╠═13d82f8d-c581-4cf0-b197-f80a66793b94
 # ╟─9a692171-eb79-4489-9b30-4fff1e9b3b98
 # ╟─4654ca38-b6c0-4aaa-b906-9d02ab17737f
-# ╟─4bc9c5a9-09f6-4a22-b34b-cb26de452746
+# ╠═4bc9c5a9-09f6-4a22-b34b-cb26de452746
 # ╟─1ed3cc3d-c30e-4fd6-b9d2-48b5c9c3c92f
 # ╟─63867307-4db9-42d1-9977-623521235806
 # ╟─ce3942ee-18de-41fb-a9da-435567a487ec
 # ╟─c93e881d-af20-4377-a9d2-4711b57d8bf1
 # ╟─c4bea5fe-e139-4fba-b74c-c4ef8f2237d0
 # ╟─a339ba91-4a29-4498-bcfa-c155ae2e7867
-# ╠═40dab807-b8f9-4d02-abb6-755de810e903
+# ╟─40dab807-b8f9-4d02-abb6-755de810e903
+# ╟─15287f58-1bb4-4f0e-a645-fef597b9ffdf
 # ╟─ecf4abcd-2012-4645-8f13-5899afcd5160
 # ╟─929fe9d1-9639-413a-bede-2f7e9487153e
+# ╠═7ba08828-6a61-456e-b6d8-9738e31f1995
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
