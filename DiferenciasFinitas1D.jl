@@ -24,7 +24,7 @@ end
 
 # ╔═╡ 262b11db-9d38-4ca2-b134-0546d89f735b
 md"""
-# Diferencias Finitas
+# Diferencias Finitas Clásicas en 1D
 """
 
 # ╔═╡ 5c65dd74-0e6a-49d0-b850-5fc9ce89d738
@@ -36,37 +36,27 @@ md"""Creamos la tabla de contenidos"""
 # ╔═╡ 46faaddf-2e7c-42f0-865a-f01b68820f89
 TableOfContents()
 
-# ╔═╡ 255cc6d7-9912-446d-8692-a8ed8a1f2719
-md"""
-## Diferencias Finitas Clásicas
-"""
-
 # ╔═╡ b4902b16-e90f-4b66-b24e-3092e2dc5c19
 md"""
 Las diferencias finitas son un método para resolver numéricamente ecuaciones diferenciales. Lo que se hace es cambiar las derivadas por diferencias, las cuales con ecuaciones discretas que aproximan la derivada. De esta manera ya no tenemos una ecuación diferencial sino que tenemos un sistema de ecuaciones algebraicas, grande pero finito, que podemos resolver mediante una computadora. Hay diferentes formulas con las que podemos aproximar las derivadas, las cuales veremos a continuación.
 """
 
-# ╔═╡ 2662adeb-ca8d-4cae-a0aa-152846bf37bc
-md"""
-### 1D
-"""
-
 # ╔═╡ 408bc361-57b9-40a0-a9b6-3bc70e484072
-md"""#### Primer orden"""
+md"""## Primer orden"""
 
 # ╔═╡ 5338756c-1cea-4d78-ad6f-9327943fbb5b
 md"""
-Si discretizamos el dominio de tal manera que tengamos $n$ nodos ($n-1$ intervalos de tamaño $h$, donde $h=\frac{b-a}{n-1}$), entonces tendremos la gráfica de de la izquierda. Al aproximar alguna función utulizando solo esto nodos entonces tendremos algo parecido a la gráfica de la derecha, donde se está calculando la función $u(x) = \sin(2\pi x)$. Al ir aumentando el número de nodos $n$ podemos ver como nuestra aproximación a la función cada vez es mejor.
+Si discretizamos el dominio de tal manera que tengamos $N$ nodos ($N-1$ intervalos de tamaño $h$, donde $h=\frac{b-a}{N-1}$), entonces tendremos la gráfica de de la izquierda. Al aproximar alguna función utulizando solo esto nodos entonces tendremos algo parecido a la gráfica de la derecha, donde se está calculando la función $u(x) = \sin(2\pi x)$. Al ir aumentando el número de nodos $N$ podemos ver como nuestra aproximación a la función cada vez es mejor.
 """
 
 # ╔═╡ 354d7f42-26d5-4d4f-91e2-926208b26c53
 md"""
-Número de puntos $n =$ $(@bind n Slider(5:31, default=9, show_value=true))
+Número de puntos $N =$ $(@bind N Slider(5:31, default=9, show_value=true))
 """
 
 # ╔═╡ 13d82f8d-c581-4cf0-b197-f80a66793b94
 begin
-	x = collect(range(0,1,n))
+	x = collect(range(0,1,N))
 	y = 0 .* x
 	linea_hor = plot(x,y, legend=false, background=:black)
 	scatter!(x,y, color=:1)
@@ -91,7 +81,7 @@ begin
 
 	# longitud h del intervalo
 	altura_anotacion = -0.2
-	point1 = floor(Int,n/2)+1
+	point1 = floor(Int,N/2)+1
 	point2 = point1+1
 	points = [x[point1] altura_anotacion; x[point2] altura_anotacion]
 	plot!(points[:,1], points[:,2], color=:white)
@@ -110,6 +100,7 @@ end
 
 # ╔═╡ 4654ca38-b6c0-4aaa-b906-9d02ab17737f
 md"""
+### Usando la definición de la derivada
 Recordando del cálculo diferencial la definición de la derivada:
 
 $u'(x) = \lim_{h \rightarrow 0} \frac{u(x+h)-u(x)}{h}$
@@ -147,6 +138,7 @@ De forma análoga podemos obtener la **diferencia hacia atrás**:
 
 # ╔═╡ 4bc9c5a9-09f6-4a22-b34b-cb26de452746
 md"""
+### Usando la serie de Taylor
 Otra forma de obtener las diferencias es utilizando la serie de Taylor de la función $u$.
 
 $u(x)|_\alpha = u(\alpha) + \frac{u'(\alpha)}{1!}(x-\alpha) + \frac{u''(\alpha)}{2!}(x-\alpha)^2 + \frac{u'''(\alpha)}{3!}(x-\alpha)^3 + \cdots + \frac{u^{(n)}(\alpha)}{n!}(x-\alpha)^n + \cdots$
@@ -219,7 +211,7 @@ donde $\Delta_\circ u = u_{i+1} - u_{i-1}$ es la **diferencia centrada**, y el e
 """
 
 # ╔═╡ c4bea5fe-e139-4fba-b74c-c4ef8f2237d0
-md"""##### Resumen
+md"""### Resumen
 En resumen para aproximar la primera derivada tenemos las ecuaciones:
 - Diferencia hacia adelante
 
@@ -235,11 +227,11 @@ En resumen para aproximar la primera derivada tenemos las ecuaciones:
 """
 
 # ╔═╡ a339ba91-4a29-4498-bcfa-c155ae2e7867
-md"""#### Orden superior"""
+md"""## Orden superior"""
 
 # ╔═╡ 40dab807-b8f9-4d02-abb6-755de810e903
 md"""
-Tomemos ahora las expansiones en serie de Taylor en $x_{i+1}$ y en $x_{i-1}$
+Tomemos ahora las expansiones en serie de Taylor en $x_{i+1}$ y en $x_{i-1}$ tomando hasta la tercer derivada.
 
 $u(x_{i+1}) = u(x_i) + hu'(x_i) + \frac{h^2}{2}u''(x_i) + \frac{h^3}{6}u'''(x_i) + O(h^4)$
 
@@ -257,20 +249,35 @@ Despejando $u''(x_i)$
 $\frac{u(x_{i+1}) - 2u(x_i) + u(x_{i-1})}{h^2} = u''(x_i) + O(h^4)$
 
 > $u''_i \approx \frac{u_{i+1} - 2u_i + u_{i-1}}{h^2} = \frac{\Delta^2 u}{\Delta x^2}$
+
+La cual es conocida como segunda diferencia, o como diferencia de segundo orden.
 """
 
-# ╔═╡ ecf4abcd-2012-4645-8f13-5899afcd5160
+# ╔═╡ 213154f2-369d-4fb4-9dbb-c3ea5e8e691b
 md"""
-### 2D
+# Apéndice de funciones
 """
 
-# ╔═╡ 929fe9d1-9639-413a-bede-2f7e9487153e
-md"""
-## Diferencias Fintas Generalizadas
-"""
+# ╔═╡ fb90996b-f677-4515-8b9c-cfbbea4063b6
+space = html"""<br>"""
 
-# ╔═╡ 7ba08828-6a61-456e-b6d8-9738e31f1995
+# ╔═╡ 082a3fde-9d2e-4626-a034-e716010a078a
+space
 
+# ╔═╡ 647c8d30-e616-476e-9588-3c09145ec123
+space
+
+# ╔═╡ 0448a5d1-936f-433a-844d-c56764aba85e
+space
+
+# ╔═╡ dae3ec6b-59f1-43ce-8dc3-1cf77c2b38a2
+space
+
+# ╔═╡ 64736cdf-7fbd-4d33-9a0a-3077ece665e9
+space
+
+# ╔═╡ a9e56556-e000-460a-b8ad-2df854e4538b
+space
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -1257,26 +1264,29 @@ version = "1.4.1+0"
 # ╠═bc18b560-765f-11ed-3230-cbd81e89c390
 # ╟─276db167-7edb-45b8-bd77-0a376b3882e8
 # ╠═46faaddf-2e7c-42f0-865a-f01b68820f89
-# ╟─255cc6d7-9912-446d-8692-a8ed8a1f2719
 # ╟─b4902b16-e90f-4b66-b24e-3092e2dc5c19
-# ╟─2662adeb-ca8d-4cae-a0aa-152846bf37bc
+# ╟─082a3fde-9d2e-4626-a034-e716010a078a
 # ╟─408bc361-57b9-40a0-a9b6-3bc70e484072
 # ╟─5338756c-1cea-4d78-ad6f-9327943fbb5b
-# ╠═354d7f42-26d5-4d4f-91e2-926208b26c53
+# ╟─354d7f42-26d5-4d4f-91e2-926208b26c53
 # ╟─13d82f8d-c581-4cf0-b197-f80a66793b94
 # ╟─9a692171-eb79-4489-9b30-4fff1e9b3b98
+# ╟─647c8d30-e616-476e-9588-3c09145ec123
 # ╟─4654ca38-b6c0-4aaa-b906-9d02ab17737f
+# ╟─0448a5d1-936f-433a-844d-c56764aba85e
 # ╟─4bc9c5a9-09f6-4a22-b34b-cb26de452746
 # ╟─1ed3cc3d-c30e-4fd6-b9d2-48b5c9c3c92f
 # ╟─63867307-4db9-42d1-9977-623521235806
 # ╟─ce3942ee-18de-41fb-a9da-435567a487ec
 # ╟─c93e881d-af20-4377-a9d2-4711b57d8bf1
+# ╟─dae3ec6b-59f1-43ce-8dc3-1cf77c2b38a2
 # ╟─c4bea5fe-e139-4fba-b74c-c4ef8f2237d0
+# ╟─64736cdf-7fbd-4d33-9a0a-3077ece665e9
 # ╟─a339ba91-4a29-4498-bcfa-c155ae2e7867
 # ╟─40dab807-b8f9-4d02-abb6-755de810e903
 # ╟─15287f58-1bb4-4f0e-a645-fef597b9ffdf
-# ╟─ecf4abcd-2012-4645-8f13-5899afcd5160
-# ╟─929fe9d1-9639-413a-bede-2f7e9487153e
-# ╠═7ba08828-6a61-456e-b6d8-9738e31f1995
+# ╟─a9e56556-e000-460a-b8ad-2df854e4538b
+# ╟─213154f2-369d-4fb4-9dbb-c3ea5e8e691b
+# ╠═fb90996b-f677-4515-8b9c-cfbbea4063b6
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
