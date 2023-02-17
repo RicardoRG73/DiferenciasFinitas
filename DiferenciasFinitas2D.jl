@@ -14,279 +14,71 @@ macro bind(def, element)
     end
 end
 
-# ╔═╡ bc18b560-765f-11ed-3230-cbd81e89c390
+# ╔═╡ 91fee010-aeef-11ed-2303-d3af51f9f402
 begin
 	using PlutoUI
 	using Plots
 	using LaTeXStrings
-	import Statistics
 end
 
-# ╔═╡ 262b11db-9d38-4ca2-b134-0546d89f735b
-md"""
-# Diferencias Finitas Clásicas en 1D
-"""
-
-# ╔═╡ 5c65dd74-0e6a-49d0-b850-5fc9ce89d738
-md"""Importamos las librerias necesarias"""
-
-# ╔═╡ 276db167-7edb-45b8-bd77-0a376b3882e8
-md"""Creamos la tabla de contenidos"""
-
-# ╔═╡ 46faaddf-2e7c-42f0-865a-f01b68820f89
+# ╔═╡ d97714e0-699d-4bd6-9fc0-bcae3eea2a76
 TableOfContents()
 
-# ╔═╡ b4902b16-e90f-4b66-b24e-3092e2dc5c19
-md"""
-Las diferencias finitas son un método para resolver numéricamente ecuaciones diferenciales. Lo que se hace es cambiar las derivadas por diferencias, las cuales con ecuaciones discretas que aproximan la derivada. De esta manera ya no tenemos una ecuación diferencial sino que tenemos un sistema de ecuaciones algebraicas, grande pero finito, que podemos resolver mediante una computadora. Hay diferentes formulas con las que podemos aproximar las derivadas, las cuales veremos a continuación.
-"""
+# ╔═╡ 882439ef-f61b-4e7a-8c4c-ae9fb49a3414
+md"""# Diferencias Finitas en 2D"""
 
-# ╔═╡ 408bc361-57b9-40a0-a9b6-3bc70e484072
-md"""## Primer orden"""
+# ╔═╡ 5071041f-9c93-4b65-b0c5-5ddc7ed493e7
+md"""## Malla estructurada"""
 
-# ╔═╡ 5338756c-1cea-4d78-ad6f-9327943fbb5b
-md"""
-Si discretizamos el dominio de tal manera que tengamos $N$ nodos ($N-1$ intervalos de tamaño $h$, donde $h=\frac{b-a}{N-1}$), entonces tendremos la gráfica de de la izquierda. Al aproximar alguna función utulizando solo esto nodos entonces tendremos algo parecido a la gráfica de la derecha, donde se está calculando la función $u(x) = \sin(2\pi x)$. Al ir aumentando el número de nodos $N$ podemos ver como nuestra aproximación a la función cada vez es mejor.
-"""
+# ╔═╡ f3bcc5fd-29b8-4de7-98ac-0b0941e88fa0
+md"""número de nodos en cada eje: n = $(@bind n Slider(4:21, default=4, show_value=true))"""
 
-# ╔═╡ 354d7f42-26d5-4d4f-91e2-926208b26c53
-md"""
-Número de puntos $N =$ $(@bind N Slider(5:31, default=9, show_value=true))
-"""
-
-# ╔═╡ 13d82f8d-c581-4cf0-b197-f80a66793b94
+# ╔═╡ 0288ad2f-b444-48a6-bcdf-a4cba13160ef
 begin
-	x = collect(range(0,1,N))
-	y = 0 .* x
-	linea_hor = plot(x,y, legend=false, background=:black)
-	scatter!(x,y, color=:1)
-	title!("Nodos")
-	ylims!((-0.5,0.5))
-
-	y₂ = sin.(2*pi*x)
-	gr_sin = plot(x, y₂, legend=false)
-	scatter!(x, y₂, color=:1)
-	title!(L"u(x) = \sin(2\pi x)")
-	plot(linea_hor, gr_sin)
-	ylims!((-1.2,1.2), size=(700,300))
+	x = collect(range(start=0, stop=1, length=n))
+	y = x
+	x = ones(n) * x'
+	y = y * ones(n)'
+	x = x[:]
+	y = y[:]
 end
 
-# ╔═╡ 9a692171-eb79-4489-9b30-4fff1e9b3b98
+# ╔═╡ 38e9ec38-d583-4ddb-9af9-bfbe9f9bee6b
 begin
-	# Linea de nodos
-	linea_hor_texto = plot(x,y, legend=false, background=:black, size=(700, 200))
-	scatter!(x,y, color=:1)
-	title!("Nodos")
-	ylims!((-0.5,0.5))
-
-	# longitud h del intervalo
-	altura_anotacion = -0.2
-	point1 = floor(Int,N/2)+1
-	point2 = point1+1
-	points = [x[point1] altura_anotacion; x[point2] altura_anotacion]
-	plot!(points[:,1], points[:,2], color=:white)
-	scatter!(points[:,1], points[:,2], color=:white, markersize=2)
-	annotate!(Statistics.mean(points[:,1]),altura_anotacion-0.05,text(L"h", 10, :white))
-
-	# identificación de los nodos i-1, i, i+1
-	point0 = point1-1
-	points_color = "yellow"
-	annotate!(x[point1],-1altura_anotacion+0.05,text(L"x_i", 13, points_color, :center))
-	annotate!(x[point0],-1altura_anotacion-0.05,text(L"x_{i-1}", 13, points_color, :right))
-	annotate!(x[point2],-1altura_anotacion-0.05,text(L"x_{i+1}", 13, points_color, :left))
-	points = [[x[point0] altura_anotacion]; points]
-	scatter!(points[:,1], 0*points[:,1], color=points_color)
+	scatter(x,y, color=:1, legend=false, background="#272727")
+	plot!(size=(300,300))
 end
 
-# ╔═╡ 4654ca38-b6c0-4aaa-b906-9d02ab17737f
-md"""
-### Usando la definición de la derivada
-Recordando del cálculo diferencial la definición de la derivada:
-
-$u'(x) = \lim_{h \rightarrow 0} \frac{u(x+h)-u(x)}{h}$
-
-Si en lugar de calcular el límite cuando $h \rightarrow 0$ dejamos que $h$ tenga un tamaño finito, entonces tenemos:
-
-$u'(x) \approx \frac{u(x+h)-u(x)}{h}$
-
-Abora nos centramos solamente en el nodo i-ésimo con posición en $x_i$, el cual tiene dos nodos vecinos, su vecino de la izquierda tiene posición $x_{i-1} = x-h$ mientras que el vecino de la derecha tiene posición $x_{i+1}=x+h$.
-
-De esta manera obtenemos que
-
-$u'(x_i) \approx \frac{u(x_{i+1})-u(x_{i})}{h}$
-
-Si escribimos de manera compacta:
-
-$u'(x_i) = u'_i$
-
-$u(x_{i+1})=u_{i+1}$
-
-$u(x_i)=u_i$
-
-$u(x_{i-1})=u_{i-1}$
-
-entonces podemos escribir
-
-> $u'_i \approx \frac{u_{i+1}-u_{i}}{h} = \frac{\Delta_+ u}{\Delta x}$
-
-donde $\Delta_+ u = u_{i+1}-u_{i}$ se le conoce como **diferencia hacia adelante**.
-
-De forma análoga podemos obtener la **diferencia hacia atrás**:
-
-> $u'_i \approx \frac{u_{i}-u_{i-1}}{h} = \frac{\Delta_- u}{\Delta x}$
-"""
-
-# ╔═╡ 4bc9c5a9-09f6-4a22-b34b-cb26de452746
-md"""
-### Usando la serie de Taylor
-Otra forma de obtener las diferencias es utilizando la serie de Taylor de la función $u$.
-
-$u(x)|_\alpha = u(\alpha) + \frac{u'(\alpha)}{1!}(x-\alpha) + \frac{u''(\alpha)}{2!}(x-\alpha)^2 + \frac{u'''(\alpha)}{3!}(x-\alpha)^3 + \cdots + \frac{u^{(n)}(\alpha)}{n!}(x-\alpha)^n + \cdots$
-"""
-
-# ╔═╡ 1ed3cc3d-c30e-4fd6-b9d2-48b5c9c3c92f
-md"""
-En forma compacta se puede escribir como
-
-$u(x)|_\alpha = \sum_{n=1}^\infty \frac{u^{(n)}(\alpha)}{n!}(x-\alpha)^n$
-"""
-
-# ╔═╡ 63867307-4db9-42d1-9977-623521235806
-md"""
-Considerando solamente la expanción hasta primer orden, y centrando en $x_{i+1}$ tenemos:
-
-$u(x_{i+1}) = u(x_i) + hu'(x_i) + O(h^2)$
-
-donde $O(h^2)$ es la notación "BigO" que indica el orden del error.
-
-Despejando entonces obtenemos:
-
-$\frac{u(x_{i+1}) - u(x_i)}{h} = u'(x_i) + O(h)$
-
-Entonces la aproximación a la derivada es
-
-> $u'_i \approx \frac{u_{i+1} - u_i}{h} = \frac{\Delta_+ u}{\Delta x}$
-
-y el error de truncamiento $\tau$ es de orden $h$.
-"""
-
-# ╔═╡ ce3942ee-18de-41fb-a9da-435567a487ec
-md"""
-Si ahora centramos la expansión en $x_{i-1}$ tenemos:
-
-$u(x_{i-1}) = u(x_i) - hu'(x_i) + O(h^2)$
-
-Despejando
-
-$\frac{u(x_i) - u(x_{i-1})}{h} = u'(x_i) + O(h)$
-
-Entonces la aproximación a la derivada es
-
-> $u'_i \approx \frac{u_i - u_{i-1}}{h} = \frac{\Delta_- u}{\Delta x}$
-
-y el error de truncamiento $\tau$ también es de orden $h$.
-"""
-
-# ╔═╡ c93e881d-af20-4377-a9d2-4711b57d8bf1
-md"""
-Si consideramos las expansiones, tanto centrada en $x_{i+1}$ como en $x_{i-1}$, hasta segundo orden entonces tenemos:
-
-$u(x_{i+1}) = u(x_i) + hu'(x_i) + \frac{h^2}{2}u''(x_i) + O(h^3)$
-
-$u(x_{i-1}) = u(x_i) - hu'(x_i) + \frac{h^2}{2}u''(x_i) - O(h^3)$
-
-Restando las expresiones anteriores tenemos
-
-$u(x_{i+1}) - u(x_{i-1}) = 2hu'(x_i) + O(h^3)$
-
-Despejando
-
-$\frac{u(x_{i+1}) - u(x_{i-1})}{2h} = u'(x_i) + O(h^2)$
-
-Entonces la aproximación a la derivada es
-
-> $u'_i \approx \frac{u_{i+1} - u_{i-1}}{2h} = \frac{\Delta_\circ u}{2\Delta x}$
-
-donde $\Delta_\circ u = u_{i+1} - u_{i-1}$ es la **diferencia centrada**, y el error de truncamiento de esta aproximación es de orden $h^2$
-"""
-
-# ╔═╡ c4bea5fe-e139-4fba-b74c-c4ef8f2237d0
-md"""### Resumen
-En resumen para aproximar la primera derivada tenemos las ecuaciones:
-- Diferencia hacia adelante
-
-> $u'_i \approx \frac{u_{i+1} - u_i}{h} = \frac{\Delta_+ u}{\Delta x}$
-
-- Diferencia hacia atrás
-
-> $u'_i \approx \frac{u_i - u_{i-1}}{h} = \frac{\Delta_- u}{\Delta x}$
-
-- Diferencia Centrada
-
-> $u'_i \approx \frac{u_{i+1} - u_{i-1}}{2h} = \frac{\Delta_\circ u}{2\Delta x}$
-"""
-
-# ╔═╡ a339ba91-4a29-4498-bcfa-c155ae2e7867
-md"""## Orden superior"""
-
-# ╔═╡ 40dab807-b8f9-4d02-abb6-755de810e903
-md"""
-Tomemos ahora las expansiones en serie de Taylor en $x_{i+1}$ y en $x_{i-1}$ tomando hasta la tercer derivada.
-
-$u(x_{i+1}) = u(x_i) + hu'(x_i) + \frac{h^2}{2}u''(x_i) + \frac{h^3}{6}u'''(x_i) + O(h^4)$
-
-$u(x_{i-1}) = u(x_i) - hu'(x_i) + \frac{h^2}{2}u''(x_i) - \frac{h^3}{6}u'''(x_i) + O(h^4)$
-
-ahora en lugar de restar, vamos a sumar las dos expresiones, entonces obtenemos
-
-$u(x_{i+1}) + u(x_{i-1}) = 2u(x_i) + h^2u''(x_i) + O(h^4)$
-"""
-
-# ╔═╡ 15287f58-1bb4-4f0e-a645-fef597b9ffdf
-md"""
-Despejando $u''(x_i)$
-
-$\frac{u(x_{i+1}) - 2u(x_i) + u(x_{i-1})}{h^2} = u''(x_i) + O(h^4)$
-
-> $u''_i \approx \frac{u_{i+1} - 2u_i + u_{i-1}}{h^2} = \frac{\Delta^2 u}{\Delta x^2}$
-
-La cual es conocida como segunda diferencia, o como diferencia de segundo orden.
-"""
-
-# ╔═╡ 9a9ba973-3abb-484a-b88f-ea7cdb0eca11
-md"""# Ejemplos de uso"""
-
-# ╔═╡ 88c17868-b1c8-49f7-a907-6f2d1f540750
-
-
-# ╔═╡ 213154f2-369d-4fb4-9dbb-c3ea5e8e691b
-md"""
-# Apéndice de funciones
-"""
-
-# ╔═╡ fb90996b-f677-4515-8b9c-cfbbea4063b6
-space = html"""<br>"""
-
-# ╔═╡ 082a3fde-9d2e-4626-a034-e716010a078a
-space
-
-# ╔═╡ 647c8d30-e616-476e-9588-3c09145ec123
-space
-
-# ╔═╡ 0448a5d1-936f-433a-844d-c56764aba85e
-space
-
-# ╔═╡ dae3ec6b-59f1-43ce-8dc3-1cf77c2b38a2
-space
-
-# ╔═╡ 64736cdf-7fbd-4d33-9a0a-3077ece665e9
-space
-
-# ╔═╡ a9e56556-e000-460a-b8ad-2df854e4538b
-space
-
-# ╔═╡ ef45be48-4e52-44c5-85cb-a47d3c866038
-space
+# ╔═╡ 0c54d092-f313-4f39-90cc-c5914ed04cfa
+md"""Hay un total de $(n*n) nodos"""
+
+# ╔═╡ 3f876fbe-63a1-417c-9947-43f82ff5e351
+begin
+	# Indices de los nodos
+	nodos = collect(range(start=1, stop=n*n))
+	bleft = collect(range(start=1,stop=n))
+	bright = bleft .+ n*(n-1)
+	bbottom = collect(range(start=n+1,stop=n*n-2n+1,step=n))
+	btop = bbottom .+ (n - 1)
+
+	B = [bleft; bright; bbottom; btop]
+
+	nodos_con_indice = scatter(x[bleft], y[bleft], background="#272727", label="left", markersize=8)
+	scatter!(x[bright], y[bright], label="right", markersize=8)
+	scatter!(x[bbottom], y[bbottom], label="bottom", markersize=8)
+	scatter!(x[btop], y[btop], label="top", markersize=8)
+	scatter!()
+	plot!(size=(300,300))
+
+	for i ∈ B
+		annotate!(x[i]+0.02,y[i]+0.02,text(i, 13, "#ffffff", :center))
+	end
+	
+	nodos_con_indice
+end
+
+# ╔═╡ 10ad44e7-5a97-4dc3-92f2-78735ea3fa52
+range(start=7,stop=25,step=n)
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -294,12 +86,11 @@ PLUTO_PROJECT_TOML_CONTENTS = """
 LaTeXStrings = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
-Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 
 [compat]
 LaTeXStrings = "~1.3.0"
-Plots = "~1.37.2"
-PlutoUI = "~0.7.49"
+Plots = "~1.38.5"
+PlutoUI = "~0.7.50"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
@@ -308,7 +99,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.8.5"
 manifest_format = "2.0"
-project_hash = "1d3d255e2876517b6a531e86d6c37750d90df824"
+project_hash = "2d9494c436d91b560bd00be00c183cd4f43e3804"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
@@ -345,21 +136,21 @@ version = "1.16.1+1"
 
 [[deps.ChainRulesCore]]
 deps = ["Compat", "LinearAlgebra", "SparseArrays"]
-git-tree-sha1 = "e7ff6cadf743c098e08fca25c91103ee4303c9bb"
+git-tree-sha1 = "c6d890a52d2c4d55d326439580c3b8d0875a77d9"
 uuid = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
-version = "1.15.6"
+version = "1.15.7"
 
 [[deps.ChangesOfVariables]]
 deps = ["ChainRulesCore", "LinearAlgebra", "Test"]
-git-tree-sha1 = "38f7a08f19d8810338d4f5085211c7dfa5d5bdd8"
+git-tree-sha1 = "844b061c104c408b24537482469400af6075aae4"
 uuid = "9e997f8a-9a97-42d5-a9f1-ce6bfc15e2c0"
-version = "0.1.4"
+version = "0.1.5"
 
 [[deps.CodecZlib]]
 deps = ["TranscodingStreams", "Zlib_jll"]
-git-tree-sha1 = "ded953804d019afa9a3f98981d99b33e3db7b6da"
+git-tree-sha1 = "9c209fb7536406834aa938fb149964b985de6c83"
 uuid = "944b1d66-785c-5afd-91f1-9de20f533193"
-version = "0.7.0"
+version = "0.7.1"
 
 [[deps.ColorSchemes]]
 deps = ["ColorTypes", "ColorVectorSpace", "Colors", "FixedPointNumbers", "Random", "SnoopPrecompile"]
@@ -375,21 +166,21 @@ version = "0.11.4"
 
 [[deps.ColorVectorSpace]]
 deps = ["ColorTypes", "FixedPointNumbers", "LinearAlgebra", "SpecialFunctions", "Statistics", "TensorCore"]
-git-tree-sha1 = "d08c20eef1f2cbc6e60fd3612ac4340b89fea322"
+git-tree-sha1 = "600cc5508d66b78aae350f7accdb58763ac18589"
 uuid = "c3611d14-8923-5661-9e6a-0046d554d3a4"
-version = "0.9.9"
+version = "0.9.10"
 
 [[deps.Colors]]
 deps = ["ColorTypes", "FixedPointNumbers", "Reexport"]
-git-tree-sha1 = "73e9c4144410f6b11f2f818488728d3afd60943c"
+git-tree-sha1 = "fc08e5930ee9a4e03f84bfb5211cb54e7769758a"
 uuid = "5ae59095-9a9b-59fe-a467-6f913c188581"
-version = "0.12.9"
+version = "0.12.10"
 
 [[deps.Compat]]
 deps = ["Dates", "LinearAlgebra", "UUIDs"]
-git-tree-sha1 = "00a2cccc7f098ff3b66806862d275ca3db9e6e5a"
+git-tree-sha1 = "61fdd77467a5c3ad071ef8277ac6bd6af7dd4c04"
 uuid = "34da2185-b29b-5c13-b0c7-acf172513d20"
-version = "4.5.0"
+version = "4.6.0"
 
 [[deps.CompilerSupportLibraries_jll]]
 deps = ["Artifacts", "Libdl"]
@@ -402,9 +193,9 @@ uuid = "d38c429a-6771-53c6-b99e-75d170b6e991"
 version = "0.6.2"
 
 [[deps.DataAPI]]
-git-tree-sha1 = "e08915633fcb3ea83bf9d6126292e5bc5c739922"
+git-tree-sha1 = "e8119c1a33d267e16108be441a287a6981ba1630"
 uuid = "9a962f9c-6df0-11e9-0e5d-c546b8b5ee8a"
-version = "1.13.0"
+version = "1.14.0"
 
 [[deps.DataStructures]]
 deps = ["Compat", "InteractiveUtils", "OrderedCollections"]
@@ -490,15 +281,15 @@ version = "3.3.8+0"
 
 [[deps.GR]]
 deps = ["Artifacts", "Base64", "DelimitedFiles", "Downloads", "GR_jll", "HTTP", "JSON", "Libdl", "LinearAlgebra", "Pkg", "Preferences", "Printf", "Random", "Serialization", "Sockets", "TOML", "Tar", "Test", "UUIDs", "p7zip_jll"]
-git-tree-sha1 = "051072ff2accc6e0e87b708ddee39b18aa04a0bc"
+git-tree-sha1 = "660b2ea2ec2b010bb02823c6d0ff6afd9bdc5c16"
 uuid = "28b8d3ca-fb5f-59d9-8090-bfdbd6d07a71"
-version = "0.71.1"
+version = "0.71.7"
 
 [[deps.GR_jll]]
-deps = ["Artifacts", "Bzip2_jll", "Cairo_jll", "FFMPEG_jll", "Fontconfig_jll", "GLFW_jll", "JLLWrappers", "JpegTurbo_jll", "Libdl", "Libtiff_jll", "Pixman_jll", "Pkg", "Qt5Base_jll", "Zlib_jll", "libpng_jll"]
-git-tree-sha1 = "501a4bf76fd679e7fcd678725d5072177392e756"
+deps = ["Artifacts", "Bzip2_jll", "Cairo_jll", "FFMPEG_jll", "Fontconfig_jll", "GLFW_jll", "JLLWrappers", "JpegTurbo_jll", "Libdl", "Libtiff_jll", "Pixman_jll", "Qt5Base_jll", "Zlib_jll", "libpng_jll"]
+git-tree-sha1 = "d5e1fd17ac7f3aa4c5287a61ee28d4f8b8e98873"
 uuid = "d2c73de3-f751-5644-a686-071e5b155ba9"
-version = "0.71.1+0"
+version = "0.71.7+0"
 
 [[deps.Gettext_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "JLLWrappers", "Libdl", "Libiconv_jll", "Pkg", "XML2_jll"]
@@ -525,9 +316,9 @@ version = "1.0.2"
 
 [[deps.HTTP]]
 deps = ["Base64", "CodecZlib", "Dates", "IniFile", "Logging", "LoggingExtras", "MbedTLS", "NetworkOptions", "OpenSSL", "Random", "SimpleBufferStream", "Sockets", "URIs", "UUIDs"]
-git-tree-sha1 = "822a2b8d53fd5fb8d2f454d521d51dd88bcfc8a6"
+git-tree-sha1 = "37e4657cd56b11abe3d10cd4a1ec5fbdb4180263"
 uuid = "cd3eb016-35fb-5094-929b-558a96fad6f3"
-version = "1.6.0"
+version = "1.7.4"
 
 [[deps.HarfBuzz_jll]]
 deps = ["Artifacts", "Cairo_jll", "Fontconfig_jll", "FreeType2_jll", "Glib_jll", "Graphite2_jll", "JLLWrappers", "Libdl", "Libffi_jll", "Pkg"]
@@ -622,9 +413,9 @@ version = "1.3.0"
 
 [[deps.Latexify]]
 deps = ["Formatting", "InteractiveUtils", "LaTeXStrings", "MacroTools", "Markdown", "OrderedCollections", "Printf", "Requires"]
-git-tree-sha1 = "ab9aa169d2160129beb241cb2750ca499b4e90e9"
+git-tree-sha1 = "2422f47b34d4b127720a18f86fa7b1aa2e141f29"
 uuid = "23fbe1c1-3f47-55db-b15f-69d7ec21a316"
-version = "0.15.17"
+version = "0.15.18"
 
 [[deps.LibCURL]]
 deps = ["LibCURL_jll", "MozillaCACerts_jll"]
@@ -702,9 +493,9 @@ uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 
 [[deps.LogExpFunctions]]
 deps = ["ChainRulesCore", "ChangesOfVariables", "DocStringExtensions", "InverseFunctions", "IrrationalConstants", "LinearAlgebra"]
-git-tree-sha1 = "946607f84feb96220f480e0422d3484c49c00239"
+git-tree-sha1 = "680e733c3a0a9cea9e935c8c2184aea6a63fa0b5"
 uuid = "2ab3a3ac-af41-5b50-aa03-7779005ae688"
-version = "0.3.19"
+version = "0.3.21"
 
 [[deps.Logging]]
 uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
@@ -748,9 +539,9 @@ version = "0.3.2"
 
 [[deps.Missings]]
 deps = ["DataAPI"]
-git-tree-sha1 = "bf210ce90b6c9eed32d25dbcae1ebc565df2687f"
+git-tree-sha1 = "f66bdc5de519e8f8ae43bdc598782d35a25b1272"
 uuid = "e1d29d7a-bbdc-5cf2-9ac0-f12de2c33e28"
-version = "1.0.2"
+version = "1.1.0"
 
 [[deps.Mmap]]
 uuid = "a63ad114-7e13-5084-954f-fe012c677804"
@@ -761,9 +552,9 @@ version = "2022.2.1"
 
 [[deps.NaNMath]]
 deps = ["OpenLibm_jll"]
-git-tree-sha1 = "a7c3d1da1189a1c2fe843a3bfa04d18d20eb3211"
+git-tree-sha1 = "0877504529a3e5c3343c6f8b4c0381e57e4387e4"
 uuid = "77ba4419-2d1f-58cd-9bb1-8ffee604a2e3"
-version = "1.0.1"
+version = "1.0.2"
 
 [[deps.NetworkOptions]]
 uuid = "ca575930-c2e3-43a9-ace4-1e988b2c1908"
@@ -787,15 +578,15 @@ version = "0.8.1+0"
 
 [[deps.OpenSSL]]
 deps = ["BitFlags", "Dates", "MozillaCACerts_jll", "OpenSSL_jll", "Sockets"]
-git-tree-sha1 = "df6830e37943c7aaa10023471ca47fb3065cc3c4"
+git-tree-sha1 = "6503b77492fd7fcb9379bf73cd31035670e3c509"
 uuid = "4d8831e6-92b7-49fb-bdf8-b643e874388c"
-version = "1.3.2"
+version = "1.3.3"
 
 [[deps.OpenSSL_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
-git-tree-sha1 = "f6e9dba33f9f2c44e08a020b0caf6903be540004"
+git-tree-sha1 = "9ff31d101d987eb9d66bd8b176ac7c277beccd09"
 uuid = "458c3c95-2e84-50aa-8efc-19380b2a3a95"
-version = "1.1.19+0"
+version = "1.1.20+0"
 
 [[deps.OpenSpecFun_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "JLLWrappers", "Libdl", "Pkg"]
@@ -821,9 +612,9 @@ version = "10.40.0+0"
 
 [[deps.Parsers]]
 deps = ["Dates", "SnoopPrecompile"]
-git-tree-sha1 = "b64719e8b4504983c7fca6cc9db3ebc8acc2a4d6"
+git-tree-sha1 = "6f4fbcd1ad45905a5dee3f4256fabb49aa2110c6"
 uuid = "69de0a69-1ddd-5017-9359-2bf0b02dc9f0"
-version = "2.5.1"
+version = "2.5.7"
 
 [[deps.Pipe]]
 git-tree-sha1 = "6842804e7867b115ca9de748a0cf6b364523c16d"
@@ -849,21 +640,21 @@ version = "3.1.0"
 
 [[deps.PlotUtils]]
 deps = ["ColorSchemes", "Colors", "Dates", "Printf", "Random", "Reexport", "SnoopPrecompile", "Statistics"]
-git-tree-sha1 = "5b7690dd212e026bbab1860016a6601cb077ab66"
+git-tree-sha1 = "c95373e73290cf50a8a22c3375e4625ded5c5280"
 uuid = "995b91a9-d308-5afd-9ec6-746e21dbc043"
-version = "1.3.2"
+version = "1.3.4"
 
 [[deps.Plots]]
 deps = ["Base64", "Contour", "Dates", "Downloads", "FFMPEG", "FixedPointNumbers", "GR", "JLFzf", "JSON", "LaTeXStrings", "Latexify", "LinearAlgebra", "Measures", "NaNMath", "Pkg", "PlotThemes", "PlotUtils", "Preferences", "Printf", "REPL", "Random", "RecipesBase", "RecipesPipeline", "Reexport", "RelocatableFolders", "Requires", "Scratch", "Showoff", "SnoopPrecompile", "SparseArrays", "Statistics", "StatsBase", "UUIDs", "UnicodeFun", "Unzip"]
-git-tree-sha1 = "dadd6e31706ec493192a70a7090d369771a9a22a"
+git-tree-sha1 = "8ac949bd0ebc46a44afb1fdca1094554a84b086e"
 uuid = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
-version = "1.37.2"
+version = "1.38.5"
 
 [[deps.PlutoUI]]
 deps = ["AbstractPlutoDingetjes", "Base64", "ColorTypes", "Dates", "FixedPointNumbers", "Hyperscript", "HypertextLiteral", "IOCapture", "InteractiveUtils", "JSON", "Logging", "MIMEs", "Markdown", "Random", "Reexport", "URIs", "UUIDs"]
-git-tree-sha1 = "eadad7b14cf046de6eb41f13c9275e5aa2711ab6"
+git-tree-sha1 = "5bb5129fdd62a2bbbe17c2756932259acf467386"
 uuid = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
-version = "0.7.49"
+version = "0.7.50"
 
 [[deps.Preferences]]
 deps = ["TOML"]
@@ -891,9 +682,9 @@ uuid = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 
 [[deps.RecipesBase]]
 deps = ["SnoopPrecompile"]
-git-tree-sha1 = "18c35ed630d7229c5584b945641a73ca83fb5213"
+git-tree-sha1 = "261dddd3b862bd2c940cf6ca4d1c8fe593e457c8"
 uuid = "3cdcf5f2-1ef4-517c-9805-6587b60abb01"
-version = "1.3.2"
+version = "1.3.3"
 
 [[deps.RecipesPipeline]]
 deps = ["Dates", "NaNMath", "PlotUtils", "RecipesBase", "SnoopPrecompile"]
@@ -943,9 +734,10 @@ uuid = "777ac1f9-54b0-4bf8-805c-2214025038e7"
 version = "1.1.0"
 
 [[deps.SnoopPrecompile]]
-git-tree-sha1 = "f604441450a3c0569830946e5b33b78c928e1a85"
+deps = ["Preferences"]
+git-tree-sha1 = "e760a70afdcd461cf01a575947738d359234665c"
 uuid = "66db9d55-30c0-4569-8b51-7e840670fc0c"
-version = "1.0.1"
+version = "1.0.3"
 
 [[deps.Sockets]]
 uuid = "6462fe0b-24de-5631-8697-dd941f90decc"
@@ -1004,9 +796,9 @@ uuid = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [[deps.TranscodingStreams]]
 deps = ["Random", "Test"]
-git-tree-sha1 = "e4bdc63f5c6d62e80eb1c0043fcc0360d5950ff7"
+git-tree-sha1 = "94f38103c984f89cf77c402f2a68dbd870f8165f"
 uuid = "3bb67fe8-82b1-5028-8e26-92a6c54297fa"
-version = "0.9.10"
+version = "0.9.11"
 
 [[deps.Tricks]]
 git-tree-sha1 = "6bac775f2d42a611cdfcd1fb217ee719630c4175"
@@ -1014,9 +806,9 @@ uuid = "410a4b4d-49e4-4fbc-ab6d-cb71b17b3775"
 version = "0.1.6"
 
 [[deps.URIs]]
-git-tree-sha1 = "ac00576f90d8a259f2c9d823e91d1de3fd44d348"
+git-tree-sha1 = "074f993b0ca030848b897beff716d93aca60f06a"
 uuid = "5c2747f8-b7ea-4ff2-ba2e-563bfd36b1d4"
-version = "1.4.1"
+version = "1.4.2"
 
 [[deps.UUIDs]]
 deps = ["Random", "SHA"]
@@ -1038,9 +830,9 @@ version = "0.2.0"
 
 [[deps.Wayland_jll]]
 deps = ["Artifacts", "Expat_jll", "JLLWrappers", "Libdl", "Libffi_jll", "Pkg", "XML2_jll"]
-git-tree-sha1 = "3e61f0b86f90dacb0bc0e73a0c5a83f6a8636e23"
+git-tree-sha1 = "ed8d92d9774b077c53e1da50fd81a36af3744c1c"
 uuid = "a2964d1f-97da-50d4-b82a-358c7fce9d89"
-version = "1.19.0+0"
+version = "1.21.0+0"
 
 [[deps.Wayland_protocols_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -1050,9 +842,9 @@ version = "1.25.0+0"
 
 [[deps.XML2_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Libiconv_jll", "Pkg", "Zlib_jll"]
-git-tree-sha1 = "58443b63fb7e465a8a7210828c91c08b92132dff"
+git-tree-sha1 = "93c41695bc1c08c46c5899f4fe06d6ead504bb73"
 uuid = "02c8fc9c-b97f-50b9-bbe4-9be30ff0a78a"
-version = "2.9.14+0"
+version = "2.10.3+0"
 
 [[deps.XSLT_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Libgcrypt_jll", "Libgpg_error_jll", "Libiconv_jll", "Pkg", "XML2_jll", "Zlib_jll"]
@@ -1192,10 +984,10 @@ uuid = "83775a58-1f1d-513f-b197-d71354ab007a"
 version = "1.2.12+3"
 
 [[deps.Zstd_jll]]
-deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
-git-tree-sha1 = "e45044cd873ded54b6a5bac0eb5c971392cf1927"
+deps = ["Artifacts", "JLLWrappers", "Libdl"]
+git-tree-sha1 = "c6edfe154ad7b313c01aceca188c05c835c67360"
 uuid = "3161d3a3-bdf6-5164-811a-617609db77b4"
-version = "1.5.2+0"
+version = "1.5.4+0"
 
 [[deps.fzf_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -1268,37 +1060,15 @@ version = "1.4.1+0"
 """
 
 # ╔═╡ Cell order:
-# ╟─262b11db-9d38-4ca2-b134-0546d89f735b
-# ╟─5c65dd74-0e6a-49d0-b850-5fc9ce89d738
-# ╠═bc18b560-765f-11ed-3230-cbd81e89c390
-# ╟─276db167-7edb-45b8-bd77-0a376b3882e8
-# ╠═46faaddf-2e7c-42f0-865a-f01b68820f89
-# ╟─b4902b16-e90f-4b66-b24e-3092e2dc5c19
-# ╟─082a3fde-9d2e-4626-a034-e716010a078a
-# ╟─408bc361-57b9-40a0-a9b6-3bc70e484072
-# ╟─5338756c-1cea-4d78-ad6f-9327943fbb5b
-# ╠═354d7f42-26d5-4d4f-91e2-926208b26c53
-# ╠═13d82f8d-c581-4cf0-b197-f80a66793b94
-# ╠═9a692171-eb79-4489-9b30-4fff1e9b3b98
-# ╟─647c8d30-e616-476e-9588-3c09145ec123
-# ╟─4654ca38-b6c0-4aaa-b906-9d02ab17737f
-# ╟─0448a5d1-936f-433a-844d-c56764aba85e
-# ╟─4bc9c5a9-09f6-4a22-b34b-cb26de452746
-# ╟─1ed3cc3d-c30e-4fd6-b9d2-48b5c9c3c92f
-# ╟─63867307-4db9-42d1-9977-623521235806
-# ╟─ce3942ee-18de-41fb-a9da-435567a487ec
-# ╟─c93e881d-af20-4377-a9d2-4711b57d8bf1
-# ╟─dae3ec6b-59f1-43ce-8dc3-1cf77c2b38a2
-# ╟─c4bea5fe-e139-4fba-b74c-c4ef8f2237d0
-# ╟─64736cdf-7fbd-4d33-9a0a-3077ece665e9
-# ╟─a339ba91-4a29-4498-bcfa-c155ae2e7867
-# ╟─40dab807-b8f9-4d02-abb6-755de810e903
-# ╟─15287f58-1bb4-4f0e-a645-fef597b9ffdf
-# ╟─a9e56556-e000-460a-b8ad-2df854e4538b
-# ╟─9a9ba973-3abb-484a-b88f-ea7cdb0eca11
-# ╠═88c17868-b1c8-49f7-a907-6f2d1f540750
-# ╟─ef45be48-4e52-44c5-85cb-a47d3c866038
-# ╟─213154f2-369d-4fb4-9dbb-c3ea5e8e691b
-# ╠═fb90996b-f677-4515-8b9c-cfbbea4063b6
+# ╠═91fee010-aeef-11ed-2303-d3af51f9f402
+# ╠═d97714e0-699d-4bd6-9fc0-bcae3eea2a76
+# ╠═882439ef-f61b-4e7a-8c4c-ae9fb49a3414
+# ╠═5071041f-9c93-4b65-b0c5-5ddc7ed493e7
+# ╠═f3bcc5fd-29b8-4de7-98ac-0b0941e88fa0
+# ╠═0288ad2f-b444-48a6-bcdf-a4cba13160ef
+# ╠═38e9ec38-d583-4ddb-9af9-bfbe9f9bee6b
+# ╠═0c54d092-f313-4f39-90cc-c5914ed04cfa
+# ╠═3f876fbe-63a1-417c-9947-43f82ff5e351
+# ╠═10ad44e7-5a97-4dc3-92f2-78735ea3fa52
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
