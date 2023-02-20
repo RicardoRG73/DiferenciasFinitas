@@ -1,4 +1,4 @@
-# Diferencias Finitas - Lecciones 2023
+# Diferencias Finitas - Lectures 2023
 
 Lecciones de diferencias finitas impartidas a los compañeros de doctorado.
 
